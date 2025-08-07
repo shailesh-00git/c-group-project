@@ -204,7 +204,7 @@ void search()
       printf("Mobile: %s\n", s.mobile);
       printf("Email: %s\n", s.email);
       printf("Course: %s\n", s.course);
-      printf("Date of Birth: %d-%02d-%02d\n", s.birthDate.day, s.birthDate.month, s.birthDate.year);
+      printf("Date of Birth: %d-%d-%d\n", s.birthDate.day, s.birthDate.month, s.birthDate.year);
       found = 1;
       break;
     }
