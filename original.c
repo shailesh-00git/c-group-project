@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <conio.h>
 #include <string.h>
 
 // Structure for storing date of birth
@@ -39,16 +40,12 @@ void search(void);
 void modify(void);
 void delete_record(void);
 
-void libraryMenu(void);
-void borrowBook(void);
-void returnBook(void);
-void showBorrowedBooks(void);
-
+// Main function
 int main()
 {
   int choice = 0;
 
-  while (choice != 7)
+  while (choice != 6)
   {
     system("cls");
     printf("################## STUDENT DATABASE MANAGEMENT #####################\n");
@@ -57,8 +54,7 @@ int main()
     printf("3. Search Student\n");
     printf("4. Modify Student Record\n");
     printf("5. Delete Student Record\n");
-    printf("6. Library Management\n");
-    printf("7. Exit\n");
+    printf("6. Exit\n");
     printf("_____________________________________________________________________\n");
     printf("Enter your choice: ");
     scanf("%d", &choice);
@@ -81,9 +77,6 @@ int main()
       delete_record();
       break;
     case 6:
-      libraryMenu();
-      break;
-    case 7:
       printf("Exiting program.\n");
       break;
     default:
@@ -123,20 +116,22 @@ void add()
     scanf("%s", s.roll);
     toUpperCase(s.roll);
 
-    // Mobile number validation
+    //simple mobile length check
     do
     {
       int valid = 1;
 
       printf("Mobile Number (10 digits): ");
-      scanf("%s", s.mobile);
+      scanf("%s", s.mobile); 
 
+      // Check length
       if (strlen(s.mobile) != 10)
       {
         valid = 0;
       }
       else
       {
+        // Check that all characters are digits
         for (int i = 0; i < 10; i++)
         {
           if (s.mobile[i] < '0' || s.mobile[i] > '9')
@@ -153,11 +148,11 @@ void add()
       }
       else
       {
-        break;
+        break; // valid input
       }
     } while (1);
 
-    // Email validation
+    // Simple email check
     do
     {
       printf("Email Address: ");
@@ -165,7 +160,7 @@ void add()
 
       if (strstr(s.email, "@gmail.com") == NULL)
       {
-        printf("!!!! Invalid email (must contain '@gmail.com') !!!!\n");
+        printf("!!!! Invalid email !!!!\n");
       }
       else
       {
@@ -177,7 +172,7 @@ void add()
     scanf("%s", s.course);
     toUpperCase(s.course);
 
-    printf("Enter date of birth (dd mm yyyy): ");
+    printf("Enter date of birth (dd mm yy): ");
     scanf("%d %d %d", &s.birthDate.day, &s.birthDate.month, &s.birthDate.year);
 
     fprintf(fp, "%s %s %s %s %s %s %d %d %d\n",
@@ -202,10 +197,7 @@ void view()
   if (fp == NULL)
   {
     printf("\nFile cannot be opened.\n");
-    printf("Press any key to return...");
-    getchar();
-    getchar();
-    return;
+    exit(0);
   }
 
   system("cls");
@@ -223,8 +215,7 @@ void view()
 
   fclose(fp);
   printf("\nPress any key to return...");
-  getchar();
-  getchar();
+  getch();
 }
 
 // Search student by roll number
@@ -239,10 +230,7 @@ void search()
   if (fp == NULL)
   {
     printf("Error opening file.\n");
-    printf("Press any key to return...");
-    getchar();
-    getchar();
-    return;
+    exit(1);
   }
 
   system("cls");
@@ -275,8 +263,7 @@ void search()
 
   fclose(fp);
   printf("\nPress any key to return...");
-  getchar();
-  getchar();
+  getch();
 }
 
 // Modify student record
@@ -293,9 +280,6 @@ void modify()
   if (fp == NULL || temp == NULL)
   {
     printf("Error opening file.\n");
-    printf("Press any key to return...");
-    getchar();
-    getchar();
     return;
   }
 
@@ -357,8 +341,7 @@ void modify()
     printf("\nRecord not found.\n");
 
   printf("\nPress any key to return...");
-  getchar();
-  getchar();
+  getch();
 }
 
 // Delete student record
@@ -375,9 +358,6 @@ void delete_record()
   if (fp == NULL || temp == NULL)
   {
     printf("Error opening file.\n");
-    printf("Press any key to return...");
-    getchar();
-    getchar();
     return;
   }
 
@@ -398,7 +378,7 @@ void delete_record()
       printf("\nDeleted Record:\n");
       printf("Name: %s %s\n", s.firstName, s.lastName);
       printf("Roll: %s\n", s.roll);
-      continue; // Skip writing this record to delete it
+      continue; // Skip writing this record
     }
 
     fprintf(temp, "%s %s %s %s %s %s %d %d %d\n",
@@ -418,258 +398,5 @@ void delete_record()
     printf("\nRecord not found.\n");
 
   printf("\nPress any key to return...");
-  getchar();
-  getchar();
-}
-
-// Library management menu
-void libraryMenu()
-{
-  int choice = 0;
-  while (choice != 4)
-  {
-    system("cls");
-    printf("################## LIBRARY MANAGEMENT #####################\n");
-    printf("\n1. Borrow Book\n");
-    printf("2. Return Book\n");
-    printf("3. Show Borrowed Books\n");
-    printf("4. Back to Main Menu\n");
-    printf("__________________________________________________________\n");
-    printf("Enter your choice: ");
-    scanf("%d", &choice);
-
-    switch (choice)
-    {
-    case 1:
-      borrowBook();
-      break;
-    case 2:
-      returnBook();
-      break;
-    case 3:
-      showBorrowedBooks();
-      break;
-    case 4:
-      // Return to main menu
-      break;
-    default:
-      printf("Invalid choice. Press Enter to continue...");
-      getchar();
-      getchar();
-    }
-  }
-}
-
-// Borrow book function (allows multiple books)
-void borrowBook()
-{
-  FILE *fp;
-  char r[20];
-  char book[50];
-  struct student s;
-  int found = 0;
-  char more = 'y';
-
-  system("cls");
-  printf("======== BORROW BOOK ========\n");
-
-  printf("\nEnter student roll number: ");
-  scanf("%s", r);
-  toUpperCase(r);
-
-  // Verify student exists
-  FILE *fpStudent = fopen("abc.txt", "r");
-  if (fpStudent == NULL)
-  {
-    printf("Student records file not found.\n");
-    printf("Press any key to return...");
-    getchar();
-    getchar();
-    return;
-  }
-  while (fscanf(fpStudent, "%s %s %s %s %s %s %d %d %d",
-                s.firstName, s.lastName, s.roll, s.mobile, s.email, s.course,
-                &s.birthDate.day, &s.birthDate.month, &s.birthDate.year) != EOF)
-  {
-    if (strcmp(s.roll, r) == 0)
-    {
-      found = 1;
-      break;
-    }
-  }
-  fclose(fpStudent);
-
-  if (!found)
-  {
-    printf("Student with Roll No %s not found!\n", r);
-    printf("Press any key to return...");
-    getchar();
-    getchar();
-    return;
-  }
-
-  do
-  {
-    printf("Name of book: ");
-    getchar(); // clear newline
-    fgets(book, sizeof(book), stdin);
-    book[strcspn(book, "\n")] = 0; // remove newline
-
-    fp = fopen("library.txt", "a");
-    if (fp == NULL)
-    {
-      printf("Error opening library file.\n");
-      printf("Press any key to return...");
-      getchar();
-      getchar();
-      return;
-    }
-
-    fprintf(fp, "%s %s\n", r, book);
-    fclose(fp);
-
-    printf("\nBook '%s' borrowed successfully for student %s.\n", book, r);
-
-    printf("\nDo you want to borrow another book? (y/n): ");
-    scanf(" %c", &more);
-
-  } while (more == 'y' || more == 'Y');
-}
-
-// Return book function
-void returnBook()
-{
-  FILE *fp;
-  char r[20];
-  char borrowedBook[50];
-  char borrowedRoll[20];
-  int found = 0;
-
-  system("cls");
-  printf("======== RETURN BOOK ========\n");
-
-  printf("\nEnter student roll number: ");
-  scanf("%s", r);
-  toUpperCase(r);
-
-  // List all books borrowed by this student first
-  fp = fopen("library.txt", "r");
-  if (fp == NULL)
-  {
-    printf("Library file not found.\n");
-    printf("Press any key to return...");
-    getchar();
-    getchar();
-    return;
-  }
-
-  printf("\nBooks currently borrowed by %s:\n", r);
-  while (fscanf(fp, "%s %[^\n]", borrowedRoll, borrowedBook) != EOF)
-  {
-    if (strcmp(borrowedRoll, r) == 0)
-    {
-      printf("- %s\n", borrowedBook);
-      found = 1;
-    }
-  }
-  fclose(fp);
-
-  if (!found)
-  {
-    printf("No books currently borrowed by %s.\n", r);
-    printf("Press any key to return...");
-    getchar();
-    return;
-  }
-
-  // Ask for book to return
-  char book[50];
-  printf("\nEnter book title to return: ");
-  getchar(); // clear newline left in buffer
-  fgets(book, sizeof(book), stdin);
-  book[strcspn(book, "\n")] = 0; // remove newline
-
-  // Now remove this book record from library.txt
-  FILE *fpOld, *fpTemp;
-  found = 0;
-  fpOld = fopen("library.txt", "r");
-  fpTemp = fopen("temp.txt", "w");
-
-  if (fpOld == NULL || fpTemp == NULL)
-  {
-    printf("Error opening files.\n");
-    return;
-  }
-
-  while (fscanf(fpOld, "%s %[^\n]", borrowedRoll, borrowedBook) != EOF)
-  {
-    if (strcmp(borrowedRoll, r) == 0 && strcmp(borrowedBook, book) == 0)
-    {
-      found = 1; // skip this line, book is returned
-      continue;
-    }
-    fprintf(fpTemp, "%s %s\n", borrowedRoll, borrowedBook);
-  }
-
-  fclose(fpOld);
-  fclose(fpTemp);
-
-  remove("library.txt");
-  rename("temp.txt", "library.txt");
-
-  if (found)
-    printf("\nBook '%s' returned successfully.\n", book);
-  else
-    printf("\nNo matching record found for return.\n");
-
-  printf("Press any key to return...");
- 
-  getchar();
-}
-
-// Show all borrowed books by a student
-void showBorrowedBooks()
-{
-  FILE *fp;
-  char r[20];
-  char borrowedBook[50];
-  char borrowedRoll[20];
-  int found = 0;
-
-  system("cls");
-  printf("======== SHOW BORROWED BOOKS ========\n");
-
-  printf("\nEnter student roll number: ");
-  scanf("%s", r);
-  toUpperCase(r);
-
-  fp = fopen("library.txt", "r");
-  if (fp == NULL)
-  {
-    printf("Library file not found.\n");
-    printf("Press any key to return...");
-    getchar();
-    getchar();
-    return;
-  }
-
-  printf("\nBooks borrowed by %s:\n", r);
-
-  while (fscanf(fp, "%s %[^\n]", borrowedRoll, borrowedBook) != EOF)
-  {
-    if (strcmp(borrowedRoll, r) == 0)
-    {
-      printf("- %s\n", borrowedBook);
-      found = 1;
-    }
-  }
-
-  fclose(fp);
-
-  if (!found)
-    printf("No books currently borrowed.\n");
-
-  printf("\nPress any key to return...");
-  getchar();
-  getchar();
+  getch();
 }
